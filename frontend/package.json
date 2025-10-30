@@ -8,7 +8,7 @@
     "start": "npx http-server . -p 5500"
   },
   "dependencies": {
-    "appwrite": "^11.0.0",
+    "appwrite": "^14.0.0",
     "jspdf": "^2.5.1"
   }
 }
