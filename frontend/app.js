@@ -76,18 +76,16 @@ if ('serviceWorker' in navigator) {
 
 // Show install button
 function showInstallButton() {
-    const installSection = document.getElementById('install-section');
-    const authSection = document.getElementById('auth-section');
-    installSection.style.display = 'block';
-    authSection.style.display = 'none';
-
     const installBtn = document.getElementById('install-btn');
+    installBtn.style.display = 'block';
+
     installBtn.addEventListener('click', async () => {
         if (deferredPrompt) {
             deferredPrompt.prompt();
             const { outcome } = await deferredPrompt.userChoice;
             if (outcome === 'accepted') {
                 console.log('User accepted the install prompt');
+                installBtn.style.display = 'none';
             }
             deferredPrompt = null;
         }
@@ -153,8 +151,11 @@ loginBtn.addEventListener('click', async () => {
     loginBtn.dataset.originalText = 'Login';
 
     try {
+        console.log('Attempting login with email:', email, 'password length:', password.length);
         await account.createEmailPasswordSession(email, password);
+        console.log('Session created successfully');
         const user = await account.get();
+        console.log('User retrieved:', user);
 
         // Handle remember me (store email in localStorage)
         if (rememberMe) {
@@ -165,6 +166,11 @@ loginBtn.addEventListener('click', async () => {
 
         showDashboard(user);
     } catch (error) {
+        console.error('Login error details:', error);
+        console.error('Error code:', error.code);
+        console.error('Error message:', error.message);
+        console.error('Error response:', error.response);
+
         let errorMessage = 'Login failed. Please try again.';
 
         if (error.message.includes('Invalid credentials')) {
@@ -173,6 +179,8 @@ loginBtn.addEventListener('click', async () => {
             errorMessage = 'Account not found. Please check your email or register first.';
         } else if (error.message.includes('Too many requests')) {
             errorMessage = 'Too many login attempts. Please wait a few minutes before trying again.';
+        } else if (error.message.includes('User (role: guest) missing scope')) {
+            errorMessage = 'Account requires email verification. Please check your email.';
         }
 
         showLoginError(errorMessage);
@@ -249,7 +257,10 @@ registerBtn.addEventListener('click', async () => {
 
     try {
         await account.create('unique()', email, password);
-        alert('Registration successful! Please login.');
+        // Auto-login after registration
+        await account.createEmailPasswordSession(email, password);
+        const user = await account.get();
+        showDashboard(user);
     } catch (error) {
         alert('Registration failed: ' + error.message);
     } finally {

@@ -1,5 +1,5 @@
-/* Import Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+/* Import Google Fonts - Roboto for Android-like feel */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
 
 * {
     margin: 0;
@@ -8,12 +8,16 @@
 }
 
 body {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Roboto', sans-serif;
     margin: 0;
-    padding: 20px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 0;
+    background: #e0e5ec;
     min-height: 100vh;
     animation: fadeIn 1s ease-in;
+    /* Full-screen mobile-first design */
+    width: 100vw;
+    height: 100vh;
+    overflow-x: hidden;
 }
 
 @keyframes fadeIn {
@@ -22,14 +26,30 @@ body {
 }
 
 #app {
-    max-width: 500px;
-    margin: 0 auto;
-    background: rgba(255, 255, 255, 0.95);
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
-    backdrop-filter: blur(10px);
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    background: #e0e5ec;
+    padding: 16px;
+    /* Android Material Design: elevation and rounded corners */
+    border-radius: 0;
+    box-shadow: none;
+    backdrop-filter: none;
     animation: slideUp 0.8s ease-out;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#auth-section {
+    max-width: 400px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 20px;
+    background: #e0e5ec;
+    border-radius: 15px;
+    box-shadow: inset 8px 8px 16px #a3b1c6, inset -8px -8px 16px #ffffff;
 }
 
 @keyframes slideUp {
@@ -43,57 +63,43 @@ body {
     }
 }
 
+/* Material Design Typography */
 .app-title {
-    font-size: 3rem;
-    font-weight: 700;
-    color: #667eea;
+    font-size: 2.125rem; /* 34px */
+    font-weight: 500;
+    color: #1976d2; /* Material Blue */
     text-align: center;
-    margin-bottom: 10px;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-    animation: bounceIn 1.2s ease-out;
-}
-
-@keyframes bounceIn {
-    0% {
-        transform: scale(0.3);
-        opacity: 0;
-    }
-    50% {
-        transform: scale(1.05);
-    }
-    70% {
-        transform: scale(0.9);
-    }
-    100% {
-        transform: scale(1);
-        opacity: 1;
-    }
+    margin-bottom: 8px;
+    letter-spacing: 0.25px;
+    animation: fadeInUp 0.8s ease-out;
 }
 
 .app-subtitle {
-    font-size: 1.2rem;
-    color: #666;
+    font-size: 1rem; /* 16px */
+    color: #757575; /* Material Grey */
     text-align: center;
-    margin-bottom: 30px;
-    font-weight: 300;
+    margin-bottom: 24px;
+    font-weight: 400;
+    line-height: 1.5;
 }
 
 h1, h2, h3 {
-    color: #333;
-    margin-bottom: 20px;
+    color: #212121; /* Material Dark Grey */
+    margin-bottom: 16px;
+    font-weight: 500;
 }
 
 h2 {
-    color: #667eea;
-    font-weight: 600;
-    border-bottom: 3px solid #667eea;
-    padding-bottom: 10px;
+    font-size: 1.25rem; /* 20px */
+    color: #1976d2;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #1976d2;
     animation: slideInLeft 0.6s ease-out;
 }
 
 @keyframes slideInLeft {
     from {
-        transform: translateX(-50px);
+        transform: translateX(-20px);
         opacity: 0;
     }
     to {
@@ -102,40 +108,70 @@ h2 {
     }
 }
 
-/* Input groups with icons */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Material Design Text Fields */
 .input-group {
     position: relative;
-    margin: 15px 0;
+    margin: 16px 0;
 }
 
 .input-group input {
     display: block;
-    padding: 15px 40px 15px 15px;
     width: 100%;
-    box-sizing: border-box;
-    border-radius: 10px;
+    padding: 16px 0 8px 0;
     font-size: 16px;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Roboto', sans-serif;
+    border: none;
+    border-bottom: 1px solid #b0bec5; /* Material Grey */
+    background: transparent;
     transition: all 0.3s ease;
-    border: 2px solid #e1e5e9;
-    background: #f8f9fa;
+    color: #212121;
 }
 
 .input-group input:focus {
     outline: none;
-    border-color: #667eea;
-    background: white;
-    box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
-    transform: translateY(-2px);
+    border-bottom: 2px solid #1976d2; /* Material Blue */
+    background: transparent;
+}
+
+.input-group input:focus + .input-icon {
+    color: #1976d2;
+}
+
+.input-group label {
+    position: absolute;
+    top: 16px;
+    left: 0;
+    font-size: 16px;
+    color: #757575;
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+
+.input-group input:focus + .input-icon + label,
+.input-group input:not(:placeholder-shown) + .input-icon + label {
+    top: 0;
+    font-size: 12px;
+    color: #1976d2;
 }
 
 .input-icon {
     position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #666;
+    right: 0;
+    top: 16px;
+    color: #757575;
     pointer-events: none;
+    transition: color 0.3s ease;
 }
 
 .toggle-password {
@@ -144,7 +180,7 @@ h2 {
 }
 
 .toggle-password:hover {
-    color: #667eea;
+    color: #1976d2;
 }
 
 /* Form options */
@@ -220,49 +256,39 @@ input:focus {
     transform: translateY(-2px);
 }
 
+/* Neumorphic Buttons */
 button {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+    background: #e0e5ec;
+    color: #212121;
     border: none;
     cursor: pointer;
     font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    position: relative;
-    overflow: hidden;
-}
-
-button::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-    transition: left 0.5s;
-}
-
-button:hover::before {
-    left: 100%;
+    letter-spacing: 0.0892857143em; /* 1.25px */
+    padding: 8px 16px;
+    border-radius: 12px;
+    box-shadow: 8px 8px 16px #a3b1c6, -8px -8px 16px #ffffff;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    min-height: 36px;
+    font-size: 14px;
+    font-family: 'Roboto', sans-serif;
 }
 
 button:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+    box-shadow: inset 4px 4px 8px #a3b1c6, inset -4px -4px 8px #ffffff;
 }
 
 button:active {
-    transform: translateY(-1px);
+    box-shadow: inset 6px 6px 12px #a3b1c6, inset -6px -6px 12px #ffffff;
 }
 
 #logout-btn {
-    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
-    margin-top: 30px;
+    background: #f44336; /* Material Red */
+    margin-top: 24px;
 }
 
 #logout-btn:hover {
-    box-shadow: 0 10px 20px rgba(255, 107, 107, 0.4);
+    background: #d32f2f; /* Darker red */
 }
 
 #upload-section, #status-section, #create-officer, #stats {
