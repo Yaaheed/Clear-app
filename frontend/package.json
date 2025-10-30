@@ -1,0 +1,14 @@
+{
+  "name": "clearance-system-frontend",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Frontend for Online Clearance System",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx http-server . -p 5500"
+  },
+  "dependencies": {
+    "appwrite": "^11.0.0",
+    "jspdf": "^2.5.1"
+  }
+}

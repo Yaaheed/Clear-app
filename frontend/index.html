@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CLEAR APP - Online Clearance System</title>
+    <meta name="description" content="Online Clearance System for students and administrators">
+    <meta name="theme-color" content="#007bff">
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <div id="auth-section">
+            <h1 class="app-title">CLEAR APP</h1>
+            <p class="app-subtitle">Online Clearance System</p>
+            <div id="login-form">
+                <h2>Login</h2>
+                <div class="input-group">
+                    <input type="email" id="email" placeholder="Email" required>
+                    <span class="input-icon">📧</span>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="password" placeholder="Password" required>
+                    <span class="input-icon toggle-password">👁️</span>
+                </div>
+                <div class="form-options">
+                    <label>
+                        <input type="checkbox" id="remember-me"> Remember me
+                    </label>
+                    <a href="#" class="forgot-link">Forgot Password?</a>
+                </div>
+                <button id="login-btn">Login</button>
+                <button id="register-btn">Register as Student</button>
+                <div id="login-error" class="error-message" style="display: none;"></div>
+            </div>
+        </div>
+
+        <div id="dashboard" style="display: none;">
+            <!-- Student Dashboard -->
+            <div id="student-dashboard" style="display: none;">
+                <h2>Student Dashboard</h2>
+                <div id="student-info"></div>
+                <div id="upload-section">
+                    <h3>Upload Documents</h3>
+                    <input type="file" id="passport-upload" accept="image/*">
+                    <input type="file" id="docs-upload" multiple>
+                    <button id="upload-btn">Upload</button>
+                </div>
+                <div id="documents-section">
+                    <h3>Your Documents</h3>
+                    <button id="view-docs-btn">View Uploaded Documents</button>
+                    <div id="documents-list" style="display: none;"></div>
+                </div>
+                <div id="status-section">
+                    <h3>Clearance Status</h3>
+                    <p id="status-text"></p>
+                    <button id="download-pdf" style="display: none;">Download Certificate</button>
+                    <button id="refresh-status-btn">Refresh Status</button>
+                </div>
+            </div>
+
+            <!-- Officer Dashboard -->
+            <div id="officer-dashboard" style="display: none;">
+                <h2>Clearance Officer Dashboard</h2>
+                <div id="officer-controls">
+                    <button id="refresh-requests-btn">Refresh Requests</button>
+                    <button id="view-all-requests-btn">View All Requests</button>
+                </div>
+                <div id="clearance-requests"></div>
+            </div>
+
+            <!-- Admin Dashboard -->
+            <div id="admin-dashboard" style="display: none;">
+                <h2>Admin Dashboard</h2>
+                <div id="create-officer">
+                    <h3>Create Clearance Officer</h3>
+                    <input type="text" id="officer-name" placeholder="Name">
+                    <input type="email" id="officer-email" placeholder="Email">
+                    <input type="text" id="officer-dept" placeholder="Department">
+                    <select id="officer-role">
+                        <option value="officer">Officer</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                    <button id="create-officer-btn">Create Officer</button>
+                </div>
+                <div id="create-admin">
+                    <h3>Create Admin</h3>
+                    <input type="text" id="admin-name" placeholder="Name">
+                    <input type="email" id="admin-email" placeholder="Email">
+                    <button id="create-admin-btn">Create Admin</button>
+                </div>
+                <div id="admin-controls">
+                    <button id="refresh-stats-btn">Refresh Statistics</button>
+                    <button id="view-officers-btn">View All Officers</button>
+                    <button id="view-admins-btn">View All Admins</button>
+                </div>
+                <div id="stats"></div>
+                <div id="officers-list" style="display: none;"></div>
+                <div id="admins-list" style="display: none;"></div>
+            </div>
+
+            <button id="logout-btn">Logout</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script type="module" src="./app.js"></script>
+</body>
+</html>
