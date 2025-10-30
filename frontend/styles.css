@@ -244,15 +244,14 @@ input, button {
 }
 
 input {
-    border: 2px solid #e1e5e9;
-    background: #f8f9fa;
+    border: none;
+    background: #e0e5ec;
+    box-shadow: inset 4px 4px 8px #a3b1c6, inset -4px -4px 8px #ffffff;
 }
 
 input:focus {
     outline: none;
-    border-color: #667eea;
-    background: white;
-    box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+    box-shadow: inset 6px 6px 12px #a3b1c6, inset -6px -6px 12px #ffffff;
     transform: translateY(-2px);
 }
 
