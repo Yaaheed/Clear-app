@@ -1,5 +1,5 @@
 // Initialize Appwrite SDK
-import { Client, Account, Databases, Storage, Functions, Query } from 'https://esm.sh/appwrite@11.0.0';
+import { Client, Account, Databases, Storage, Functions, Query } from 'https://esm.sh/appwrite@14.0.0';
 
 const client = new Client()
     .setEndpoint('https://fra.cloud.appwrite.io/v1')
