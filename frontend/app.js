@@ -152,7 +152,7 @@ loginBtn.addEventListener('click', async () => {
 
     try {
         console.log('Attempting login with email:', email, 'password length:', password.length);
-        await account.createEmailPasswordSession(email, password);
+        await account.createEmailSession(email, password);
         console.log('Session created successfully');
         const user = await account.get();
         console.log('User retrieved:', user);
@@ -258,7 +258,7 @@ registerBtn.addEventListener('click', async () => {
     try {
         await account.create('unique()', email, password);
         // Auto-login after registration
-        await account.createEmailPasswordSession(email, password);
+        await account.createEmailSession(email, password);
         const user = await account.get();
         showDashboard(user);
     } catch (error) {
