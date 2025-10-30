@@ -620,6 +620,43 @@ button:active {
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
 
+/* Install section styles */
+#install-section {
+    text-align: center;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-radius: 12px;
+    margin: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.install-button {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+    margin: 20px 0;
+}
+
+.install-button:hover {
+    background: linear-gradient(135deg, #0056b3, #004085);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+}
+
+.install-note {
+    color: #666;
+    font-size: 14px;
+    text-align: center;
+    margin-top: 10px;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
     #app {

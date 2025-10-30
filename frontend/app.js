@@ -45,6 +45,22 @@ const refreshStatsBtn = document.getElementById('refresh-stats-btn');
 const viewOfficersBtn = document.getElementById('view-officers-btn');
 const viewAdminsBtn = document.getElementById('view-admins-btn');
 
+// PWA Install functionality
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    // Prevent the mini-infobar from appearing on mobile
+    e.preventDefault();
+    // Stash the event so it can be triggered later.
+    deferredPrompt = e;
+    // Update UI to notify the user they can install the PWA
+    showInstallButton();
+});
+
+window.addEventListener('appinstalled', (evt) => {
+    console.log('PWA was installed');
+});
+
 // Register service worker for PWA
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
@@ -58,13 +74,38 @@ if ('serviceWorker' in navigator) {
     });
 }
 
+// Show install button
+function showInstallButton() {
+    const installSection = document.getElementById('install-section');
+    const authSection = document.getElementById('auth-section');
+    installSection.style.display = 'block';
+    authSection.style.display = 'none';
+
+    const installBtn = document.getElementById('install-btn');
+    installBtn.addEventListener('click', async () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                console.log('User accepted the install prompt');
+            }
+            deferredPrompt = null;
+        }
+    });
+}
+
 // Initialize app
 async function init() {
     try {
         const user = await account.get();
         showDashboard(user);
     } catch (error) {
-        showAuth();
+        // Check if we should show install button
+        if (deferredPrompt) {
+            showInstallButton();
+        } else {
+            showAuth();
+        }
     }
 }
 
