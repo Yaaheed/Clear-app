@@ -537,16 +537,72 @@ async function showOfficerDashboard() {
         ]);
 
         clearanceRequests.innerHTML = '';
-        clearances.documents.forEach((clearance, index) => {
+
+        // Process each clearance request
+        for (const clearance of clearances.documents) {
             const item = document.createElement('div');
             item.className = 'clearance-item stagger-item';
+
+            // Parse document IDs
+            const docIds = JSON.parse(clearance.docs || '{}');
+
+            // Create document links HTML
+            const documentTypes = {
+                library: 'Library Clearance',
+                departmental: 'Departmental Clearance',
+                faculty: 'Faculty Clearance',
+                alumni: 'Alumni Office Clearance',
+                bursary: 'Bursary Clearance',
+                hostel: 'Hostel Clearance'
+            };
+
+            let documentsHtml = '<div class="clearance-documents"><h4>Uploaded Documents:</h4>';
+            let hasDocuments = false;
+
+            for (const [key, docId] of Object.entries(docIds)) {
+                if (docId) {
+                    try {
+                        const file = await storage.getFile('clearance_docs', docId);
+                        documentsHtml += `
+                            <div class="document-item">
+                                <span class="document-icon">📄</span>
+                                <a href="${storage.getFileView('clearance_docs', docId)}" target="_blank" class="document-link">
+                                    ${documentTypes[key] || key}
+                                </a>
+                                <span class="file-size">(${formatFileSize(file.size)})</span>
+                            </div>
+                        `;
+                        hasDocuments = true;
+                    } catch (error) {
+                        console.error(`Error loading ${key} document:`, error);
+                        documentsHtml += `
+                            <div class="document-item error">
+                                <span class="document-icon">❌</span>
+                                <span class="document-error">${documentTypes[key] || key}: Error loading document</span>
+                            </div>
+                        `;
+                    }
+                }
+            }
+
+            if (!hasDocuments) {
+                documentsHtml += '<p>No documents uploaded yet.</p>';
+            }
+            documentsHtml += '</div>';
+
             item.innerHTML = `
-                <p><strong>${clearance.studentName}</strong> (${clearance.department})</p>
-                <button onclick="approveClearance('${clearance.$id}')">Accept</button>
-                <button onclick="rejectClearance('${clearance.$id}')">Reject</button>
+                <div class="clearance-header">
+                    <p><strong>${clearance.studentName}</strong> (${clearance.department})</p>
+                    <p class="clearance-date">Submitted: ${new Date(clearance.createdAt).toLocaleDateString()}</p>
+                </div>
+                ${documentsHtml}
+                <div class="clearance-actions">
+                    <button onclick="approveClearance('${clearance.$id}')" class="approve-btn">Accept</button>
+                    <button onclick="rejectClearance('${clearance.$id}')" class="reject-btn">Reject</button>
+                </div>
             `;
             clearanceRequests.appendChild(item);
-        });
+        }
     } catch (error) {
         console.error('Error loading clearances:', error);
     }
@@ -653,7 +709,10 @@ async function uploadFileWithRetry(file, fileName, maxRetries = 3) {
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
             console.log(`Uploading ${fileName} (attempt ${attempt}/${maxRetries})`);
-            const result = await storage.createFile('clearance_docs', 'unique()', file);
+            // Convert file to Blob to ensure compatibility with Appwrite SDK
+            const arrayBuffer = await file.arrayBuffer();
+            const blob = new Blob([arrayBuffer], { type: file.type });
+            const result = await storage.createFile('clearance_docs', 'unique()', blob);
             return { success: true, fileId: result.$id };
         } catch (error) {
             console.error(`Upload attempt ${attempt} failed for ${fileName}:`, error);
@@ -830,17 +889,73 @@ uploadBtn.addEventListener('click', async () => {
 
 // Create officer
 createOfficerBtn.addEventListener('click', async () => {
-    const name = document.getElementById('officer-name').value;
-    const email = document.getElementById('officer-email').value;
-    const department = document.getElementById('officer-dept').value;
-    const role = document.getElementById('officer-role').value;
+    const name = document.getElementById('officer-name').value.trim();
+    const email = document.getElementById('officer-email').value.trim();
+    const password = document.getElementById('officer-password').value;
+    const department = document.getElementById('officer-dept').value.trim();
+    const role = 'officer'; // Default role since dropdown was removed
+
+    // Validation
+    if (!name) {
+        alert('Please enter the officer\'s name.');
+        return;
+    }
+    if (!email) {
+        alert('Please enter the officer\'s email.');
+        return;
+    }
+    if (!password) {
+        alert('Please enter a password for the officer.');
+        return;
+    }
+    if (!department) {
+        alert('Please enter the officer\'s department.');
+        return;
+    }
+    if (password.length < 8) {
+        alert('Password must be at least 8 characters long.');
+        return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        alert('Please enter a valid email address.');
+        return;
+    }
+
+    setLoading(createOfficerBtn, true);
+    createOfficerBtn.dataset.originalText = 'Create Officer';
 
     try {
-        await functions.createExecution('create-officer', JSON.stringify({ name, email, department, role }));
+        // Create user account
+        const user = await account.create(ID.unique(), email, password);
+        const userId = user.$id;
+
+        // Create officer record
+        await databases.createDocument(DATABASE_ID, 'officers', 'unique()', {
+            officerId: userId,
+            name,
+            email,
+            department,
+            role,
+            createdAt: new Date().toISOString()
+        });
+
         alert('Officer created successfully!');
+
+        // Clear form
+        document.getElementById('officer-name').value = '';
+        document.getElementById('officer-email').value = '';
+        document.getElementById('officer-password').value = '';
+        document.getElementById('officer-dept').value = '';
+
         showAdminDashboard(); // Refresh stats
     } catch (error) {
+        console.error('Error creating officer:', error);
         alert('Failed to create officer: ' + error.message);
+    } finally {
+        setLoading(createOfficerBtn, false);
     }
 });
 
