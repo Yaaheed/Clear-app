@@ -24,6 +24,10 @@
                     <input type="password" id="password" placeholder="Password" required>
                     <span class="input-icon toggle-password">👁️</span>
                 </div>
+                <div class="input-group" id="confirm-password-group" style="display: none;">
+                    <input type="password" id="confirm-password" placeholder="Confirm Password" required>
+                    <span class="input-icon">🔒</span>
+                </div>
                 <div class="form-options">
                     <label>
                         <input type="checkbox" id="remember-me"> Remember me
@@ -42,12 +46,57 @@
             <div id="student-dashboard" style="display: none;">
                 <h2>Student Dashboard</h2>
                 <div id="student-info"></div>
-                <div id="upload-section">
-                    <h3>Upload Documents</h3>
-                    <input type="file" id="passport-upload" accept="image/*">
-                    <input type="file" id="docs-upload" multiple>
-                    <button id="upload-btn">Upload</button>
+                <div id="student-setup" style="display: none;">
+                    <h3>Complete Your Profile</h3>
+                    <div class="input-group">
+                        <input type="text" id="student-name" placeholder="Full Name" required>
+                        <span class="input-icon">👤</span>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="student-matric" placeholder="Matriculation Number" required>
+                        <span class="input-icon">🎓</span>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="student-dept" placeholder="Department" required>
+                        <span class="input-icon">🏢</span>
+                    </div>
+                    <button id="save-profile-btn">Save Profile</button>
                 </div>
+                <div id="upload-section">
+                    <h3>Upload Clearance Documents</h3>
+                    <div class="input-group">
+                        <label for="library-clearance">Library Clearance <span class="required">*</span></label>
+                        <small class="field-description">Upload your library clearance certificate confirming all books have been returned and fines settled.</small>
+                        <input type="file" id="library-clearance" accept=".pdf,.jpg,.jpeg,.png" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="hostel-clearance">Hostel Clearance (Optional)</label>
+                        <small class="field-description">Upload your hostel clearance certificate if you resided in university accommodation.</small>
+                        <input type="file" id="hostel-clearance" accept=".pdf,.jpg,.jpeg,.png">
+                    </div>
+                    <div class="input-group">
+                        <label for="departmental-clearance">Departmental Clearance <span class="required">*</span></label>
+                        <small class="field-description">Upload your departmental clearance certificate from your academic department.</small>
+                        <input type="file" id="departmental-clearance" accept=".pdf,.jpg,.jpeg,.png" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="faculty-clearance">Faculty Clearance <span class="required">*</span></label>
+                        <small class="field-description">Upload your faculty clearance certificate from your faculty office.</small>
+                        <input type="file" id="faculty-clearance" accept=".pdf,.jpg,.jpeg,.png" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="alumni-clearance">Alumni Office Clearance <span class="required">*</span></label>
+                        <small class="field-description">Upload your alumni office clearance certificate for alumni registration.</small>
+                        <input type="file" id="alumni-clearance" accept=".pdf,.jpg,.jpeg,.png" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="bursary-clearance">Bursary Clearance <span class="required">*</span></label>
+                        <small class="field-description">Upload your bursary clearance certificate confirming all financial obligations are settled.</small>
+                        <input type="file" id="bursary-clearance" accept=".pdf,.jpg,.jpeg,.png" required>
+                    </div>
+                    <button id="upload-btn">Upload Documents</button>
+                </div>
+                <div id="uploaded-files" style="display: none;"></div>
                 <div id="documents-section">
                     <h3>Your Documents</h3>
                     <button id="view-docs-btn">View Uploaded Documents</button>
@@ -105,6 +154,105 @@
         </div>
     </div>
 
+    <script>
+        // Complete Buffer polyfill for browser compatibility
+        if (typeof Buffer === 'undefined') {
+            function BufferPolyfill(arg, encoding) {
+                if (!(this instanceof BufferPolyfill)) {
+                    return new BufferPolyfill(arg, encoding);
+                }
+
+                if (typeof arg === 'number') {
+                    this._data = new Uint8Array(arg);
+                } else if (arg instanceof ArrayBuffer) {
+                    this._data = new Uint8Array(arg);
+                } else if (Array.isArray(arg)) {
+                    this._data = new Uint8Array(arg);
+                } else if (typeof arg === 'string') {
+                    const encoder = new TextEncoder();
+                    this._data = encoder.encode(arg);
+                } else if (arg && arg._data instanceof Uint8Array) {
+                    this._data = arg._data;
+                } else {
+                    this._data = new Uint8Array(0);
+                }
+            }
+
+            Object.setPrototypeOf(BufferPolyfill.prototype, null);
+
+            BufferPolyfill.prototype = Object.create(null, {
+                length: {
+                    get: function() { return this._data.length; }
+                },
+                slice: {
+                    value: function(start, end) {
+                        return new BufferPolyfill(this._data.slice(start, end));
+                    }
+                },
+                subarray: {
+                    value: function(start, end) {
+                        return this._data.subarray(start, end);
+                    }
+                },
+                toString: {
+                    value: function(encoding) {
+                        if (encoding === 'base64') {
+                            let binary = '';
+                            for (let i = 0; i < this._data.length; i++) {
+                                binary += String.fromCharCode(this._data[i]);
+                            }
+                            return btoa(binary);
+                        }
+                        const decoder = new TextDecoder();
+                        return decoder.decode(this._data);
+                    }
+                },
+                write: {
+                    value: function(string, offset, length, encoding) {
+                        const encoder = new TextEncoder();
+                        const bytes = encoder.encode(string);
+                        const len = Math.min(bytes.length, length || bytes.length);
+                        this._data.set(bytes.subarray(0, len), offset || 0);
+                        return len;
+                    }
+                }
+            });
+
+            BufferPolyfill.alloc = function(size, fill, encoding) {
+                const buf = new BufferPolyfill(size);
+                if (fill !== undefined) {
+                    buf._data.fill(fill);
+                }
+                return buf;
+            };
+
+            BufferPolyfill.from = function(value, encoding) {
+                return new BufferPolyfill(value, encoding);
+            };
+
+            BufferPolyfill.isBuffer = function(obj) {
+                return obj instanceof BufferPolyfill;
+            };
+
+            BufferPolyfill.byteLength = function(string, encoding) {
+                const encoder = new TextEncoder();
+                return encoder.encode(string).length;
+            };
+
+            BufferPolyfill.concat = function(list, totalLength) {
+                const length = totalLength || list.reduce((acc, buf) => acc + buf.length, 0);
+                const result = new BufferPolyfill(length);
+                let offset = 0;
+                for (const buf of list) {
+                    result._data.set(buf._data, offset);
+                    offset += buf.length;
+                }
+                return result;
+            };
+
+            window.Buffer = BufferPolyfill;
+        }
+    </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script type="module" src="./app.js"></script>
 </body>
